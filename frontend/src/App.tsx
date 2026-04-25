@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navbar, Footer, AuthModal } from "./components";
-import { Home, Lectures, Notes, About, Tasks, AuthPage, DailyNotes, MonthlyProgress } from "./pages";
+import { Home, Lectures, LectureDetail, LectureAdmin, Notes, About, Tasks, AuthPage, DailyNotes, MonthlyProgress } from "./pages";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 function AppContent() {
@@ -46,6 +46,8 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<Home isDark={isDark} />} />
             <Route path="/lectures" element={<Lectures isDark={isDark} />} />
+            <Route path="/lectures/:id" element={<LectureDetail isDark={isDark} />} />
+            <Route path="/admin/lectures" element={<LectureAdmin isDark={isDark} />} />
             <Route path="/notes" element={<Notes isDark={isDark} />} />
             <Route path="/about" element={<About isDark={isDark} />} />
             <Route path="/tasks" element={<Tasks isDark={isDark} />} />

@@ -1,18 +1,20 @@
 import { useState } from "react";
 import type { HabitTracker } from "../types";
 import { daysOfWeek, calculateHabitProgress } from "../data/tasks";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, Trash2 } from "lucide-react";
 
 interface WeeklyTrackerProps {
   trackers: HabitTracker[];
   onToggle: (trackerId: string, day: string) => void;
   isDark: boolean;
+  onDelete?: (trackerId: string) => void;
 }
 
 export function WeeklyTracker({
   trackers,
   onToggle,
   isDark,
+  onDelete,
 }: WeeklyTrackerProps) {
   const [expandedSubject, setExpandedSubject] = useState<string | null>(null);
 
@@ -58,6 +60,12 @@ export function WeeklyTracker({
                 style={{ minWidth: "80px" }}
               >
                 Progress
+              </th>
+              <th
+                className={`px-4 py-4 text-center font-semibold ${isDark ? "text-slate-300" : "text-gray-700"}`}
+                style={{ minWidth: "60px" }}
+              >
+                Actions
               </th>
             </tr>
           </thead>
@@ -133,6 +141,23 @@ export function WeeklyTracker({
                       {progress}%
                     </span>
                   </td>
+
+                  {/* Delete Button */}
+                  <td className="px-4 py-4 text-center">
+                    {onDelete && (
+                      <button
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete this task?")) {
+                            onDelete(tracker.id);
+                          }
+                        }}
+                        className="inline-flex items-center justify-center text-red-500 hover:text-red-700 transition"
+                        title="Delete task"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    )}
+                  </td>
                 </tr>
               );
             })}
@@ -173,11 +198,26 @@ export function WeeklyTracker({
                     </div>
                   </div>
                 </div>
-                <span
-                  className={`px-2 py-1 rounded-full text-sm font-semibold ${tracker.color} text-white`}
-                >
-                  {progress}%
-                </span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-2 py-1 rounded-full text-sm font-semibold ${tracker.color} text-white`}
+                  >
+                    {progress}%
+                  </span>
+                  {onDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm("Are you sure you want to delete this task?")) {
+                          onDelete(tracker.id);
+                        }
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </div>
               </button>
 
               {/* Expanded Details */}

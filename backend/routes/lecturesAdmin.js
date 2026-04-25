@@ -68,11 +68,46 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ message: "Lecture not found" });
     }
 
-    // Increment views
-    lecture.views = (lecture.views || 0) + 1;
-    await lecture.save();
+    // Increment views (only if token is provided for authenticated user)
+    const token = req.header("Authorization");
+    if (token) {
+      lecture.views = (lecture.views || 0) + 1;
+      await lecture.save();
+    }
 
     res.status(200).json(lecture);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Get related lectures (folder structure) - returns sub-lectures and siblings
+router.get("/:id/related", verifyToken, async (req, res) => {
+  try {
+    const lecture = await Lecture.findById(req.params.id);
+    if (!lecture) return res.status(404).json({ message: "Lecture not found" });
+
+    // Get sub-lectures (children of this folder)
+    const subLectures = await Lecture.find({ parentFolder: req.params.id })
+      .populate("createdBy", "name email")
+      .sort({ order: 1 });
+
+    // Get sibling lectures (if this lecture has a parent)
+    let siblings = [];
+    if (lecture.parentFolder) {
+      siblings = await Lecture.find({
+        parentFolder: lecture.parentFolder,
+        _id: { $ne: req.params.id }, // Exclude current lecture
+      })
+        .populate("createdBy", "name email")
+        .sort({ order: 1 });
+    }
+
+    res.status(200).json({
+      current: lecture,
+      subLectures: subLectures,
+      siblings: siblings,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }

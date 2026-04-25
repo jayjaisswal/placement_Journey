@@ -61,12 +61,6 @@ export const Lectures = ({ isDark }: LecturesProps) => {
     });
   }, [searchTerm, selectedCategory, lectures]);
 
-  const handleLectureClick = () => {
-    if (!isLoggedIn) {
-      setShowAuthModal(true);
-    }
-  };
-
   return (
     <div
       className={`pt-20 min-h-screen ${isDark ? "bg-slate-950" : "bg-white"}`}
@@ -191,7 +185,6 @@ export const Lectures = ({ isDark }: LecturesProps) => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
                   viewport={{ once: true }}
-                  onClick={handleLectureClick}
                 >
                   <LectureCard lecture={{ ...lecture, id: lecture._id }} isDark={isDark} />
                 </motion.div>
