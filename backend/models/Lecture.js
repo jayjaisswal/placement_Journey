@@ -1,0 +1,56 @@
+const mongoose = require("mongoose");
+
+const LectureSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    description: { type: String },
+    instructor: { type: String },
+    category: { type: String },
+
+    // Nested Folder Structure
+    parentFolder: { type: mongoose.Schema.Types.ObjectId, ref: "Lecture" }, // Reference to parent lecture (folder)
+    isFolder: { type: Boolean, default: false }, // True if this is a folder/category
+    subfolder: { type: String }, // Path like "DSA/Arrays/Easy"
+    order: { type: Number, default: 0 }, // For ordering within folder
+
+    // Video Content
+    videoUrl: { type: String }, // YouTube video ID or URL
+    videoType: {
+      type: String,
+      enum: ["youtube", "vimeo", "file", "html5"],
+      default: "youtube",
+    },
+    duration: { type: String },
+    thumbnail: { type: String },
+
+    // Content Materials
+    lectureNotes: { type: String }, // URL or embedded notes content
+    lectureNotesFile: { type: String }, // File path for uploaded notes
+    resources: [
+      {
+        title: { type: String },
+        url: { type: String },
+        type: { type: String }, // pdf, doc, link, etc.
+      },
+    ],
+
+    // Admin Content Management
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    // Student Interactions
+    savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    views: { type: Number, default: 0 },
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    averageRating: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 },
+
+    createdAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true },
+);
+
+module.exports = mongoose.model("Lecture", LectureSchema);
